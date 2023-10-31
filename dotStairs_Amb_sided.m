@@ -1,21 +1,20 @@
-% Derived from dotStairs.m to capture PDS data for inputs into
+%% Derived from dotStairs.m to capture PDS data for inputs into
 % Palamedes psychometric curve fitting protocols. This version prepares
 % data for sided, porportion to the right, analysis.
 % RV 9/12/2023
-
 clear all
 close all
 % up-date for each animal and eye visual 
-animalId='fbae1';
+animalId='fbae2';
 
-fnames=dir(['Z:\Ferret Behavior\RDK\Amblyopia\stairs dominant\72_d_s\' animalId '\f*']);
+fnames=dir(['Z:\Ferret Behavior\RDK\Amblyopia\stairs dominant\48_d_s\' animalId '\f*']);
 
 data=[];
 trialcount=1;
 
 for f=1:length(fnames)
 
-    load(fullfile('Z:\Ferret Behavior\RDK\Amblyopia\stairs dominant\72_d_s\',animalId,fnames(f).name),'-mat')
+    load(fullfile('Z:\Ferret Behavior\RDK\Amblyopia\stairs dominant\48_d_s\',animalId,fnames(f).name),'-mat')
 
     %collect data from each trial
     
@@ -58,10 +57,11 @@ numSessions = f;
  %gives dotSpeed in deg/sec
 dotSpeed = ((PDS.conditions{1,1}.dotSpeed)*120);
 
-message = 'Which eye was UNCOVERED durring experiment? Left/Dominant (1) or Right/Weak (2): ';
-eyeVisual = input(message);
+message = 'Which eye was UNCOVERED durring experiment, Left/Dominant or Right/Weak? [l/r]: ';
+eyeVisual = input(message, 's');
 
-N = 100; % number of bootstraps to run to determine confidence intervals. 1000 recomended can lower to >=50 for fast checks
+
+N = 500; % number of bootstraps to run to determine confidence intervals. 1000 recomended can lower to >=50 for fast checks
 
 pDevBool = 'yes'; %optional, have as an extant varialbe to run goodness of fit simulations
 %This function expects a matrix called experiments. Where every row is a
@@ -75,7 +75,7 @@ pDevBool = 'yes'; %optional, have as an extant varialbe to run goodness of fit s
 
 %unsided data across all trials
 cohLevels = round(data(:,4)*100); %making into intergers and rounding
-cohLevels=unique(cohLevels);
+cohLevels = unique(cohLevels);
 correctTrial = data(:,5);
 
 %Sided analysis
@@ -101,7 +101,8 @@ end
 
  
 PF = @PAL_CumulativeNormal;
-
+addpath 'D:\git_local\RV Behavior\Palamedes';
+addpath 'D:\git_local\RV Behavior';
 %Using EK's scheme
 %PsychCurve_general_dots(data(:,[6,5]), animalId)
 
@@ -135,20 +136,6 @@ title(animalId)
 %ci_data is the 95% confidence intervals
 
  
- %% Save data
-%
-sessionResults.files = fnames;
-sessionResults.data = data;
-sessionResults.ci_95s = boot_data;
-sessionResults.dCoh = deltaCoherence;
-sessionResults.Thr75 = Threshold75;
-sessionResults.Thr82 = Threshold82;
-sessionResults.pDev = pDev;
-sessionResults.Dev = Dev;
-sessionResults.eyeVisual = eyeVisual;
-sessionResults.dotSpeed = dotSpeed;
-sessionResults.numTrials = trialcount;
-sessionResults.numSessions = numSessions;
 
 
  %% Save data
@@ -157,18 +144,25 @@ sessionResults.files = fnames;
 sessionResults.data = data;
 sessionResults.ci_95s = boot_data;
 sessionResults.dCoh = deltaCoherence;
-sessionResults.Thr75 = Threshold75;
-sessionResults.Thr82 = Threshold82;
+%sessionResults.Thr75 = Threshold75;
+%sessionResults.Thr82 = Threshold82;
 sessionResults.pDev = pDev;
 sessionResults.Dev = Dev;
 sessionResults.eyeVisual = eyeVisual;
 sessionResults.dotSpeed = dotSpeed;
 sessionResults.numTrials = trialcount;
 sessionResults.numSessions = numSessions;
+%sessionResults.PorCorrect = ProportionCorrectObserved;
+sessionResults.ci_thr = ci_thr;
+sessionResults.ci_data = ci_data;
+sessionResults.ci_s= ci_s; 
+sessionResults.thr_boot = t_boot;
+sessionResults.slope_boot = sl_boot;
+sessionResults.paramsValues = paramsValues;
 
 
-cd 'Z:\Ferret Behavior\RDK\Amblyopia\stairs dominant\72_d_s'
-save(animalId, 'sessionResults');
+cd 'Z:\Ferret Behavior\RDK\Amblyopia\stairs dominant\48_d_s\FBAE2'
+save(   animalId,   'sessionResults');
 
 
 %% summary   Optional to check if data looks off

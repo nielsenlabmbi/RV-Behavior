@@ -45,14 +45,14 @@ searchGrid.beta = logspace(-1,1,200); % search through here for slope
 %searchGrid.gamma = 0.3:0.05:0.6; %for when possibly doing worse than just guessing
 searchGrid.gamma = 0.0:0.05:0.3; %this sets left lapse rate to scan lowest possible range
 %searchGrid.lambda = floor(100-max(NumPos(end)/OutOfNum(end))*100)/100; %this sets right side lapse rate to highest % Correct
-searchGrid.lambda = 0.0:0.05:0.3;
-
+%searchGrid.lambda = 0.0:0.05:0.3; %this sets left lapse rate to scan lowest possible range
+searchGrid.lambda = 0.3:0.10:0.7; %range for when worse than guess, eg. lesion studies
 %Alternative parameters
 % searchGrid.alpha = 1:.1:30;
 %searchGrid.beta = logspace(-1,3,500);
 %searchGrid.gamma = 0.5; % use for unsided as 50% represents rate if only guessing.  
 % searchGrid.gamma = NumPos(1)/OutOfNum(1);%0.25:.05:.75;%.50;  %scalar here (since fixed) but may be vector
-% searchGrid.lambda = 1 - NumPos(end)/OutOfNum(end);%0:.05:.5;%0.02;  %ditto
+% searchGrid.lambda = 1 - NumPos(end)/OutOfNum(end); %%0:.05:.5;%0.02;  %ditto
 
 %Threshold and Slope and lapse rates are fixed
 paramsFree = [1 1 1 1];  %1: free parameter, 0: fixed parameter
@@ -98,9 +98,10 @@ disp(message);
 % Find coherence needed to shift from 50-68% correct.
 upperbound = 1-paramsValues(4); %paramsValues(4) is lapse rate, thus 1-paramsValues(4) is the upperbound on performance. 
 guessrate = paramsValues(3); %percentage at 0
+%for sided data use CumulativeNormal, for unsided use Weibull
 
-middlepoint = PAL_Weibull(paramsValues,guessrate+(upperbound-guessrate)/2,'Inverse'); 
-sixtyseven = PAL_Weibull(paramsValues,guessrate+2*(upperbound-guessrate)/3,'Inverse');
+middlepoint = PAL_CumulativeNormal(paramsValues,guessrate+(upperbound-guessrate)/2,'Inverse'); 
+sixtyseven = PAL_CumulativeNormal(paramsValues,guessrate+2*(upperbound-guessrate)/3,'Inverse');
 deltaCoherence = sixtyseven - middlepoint;
 
 % %Number of simulations to perform to determine standard error
@@ -127,7 +128,7 @@ deltaCoherence = sixtyseven - middlepoint;
 %
 if exist('pDevBool','var') & pDevBool
 %Number of simulations to perform to determine Goodness-of-Fit
-B=100;
+B=400;
 % 
 disp('Determining Goodness-of-fit.....');
 %Output: 

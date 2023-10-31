@@ -58,12 +58,14 @@ numSessions = f;
  %gives dotSpeed in deg/sec
 dotSpeed = ((PDS.conditions{1,1}.dotSpeed)*120);
 
-message = 'Which eye was UNCOVERED durring experiment? Left/Dominant (1) or Right/Weak (2): ';
-eyeVisual = input(message);
+message = 'Which eye was UNCOVERED durring experiment, Left/Dominant or Right/Weak? [l/r]: ';
+eyeVisual = input(message, 's');
 
-N = 100; % 1000 is recomended but number of bootstraps to run to determine confidence intervals, can lower to 50 for fast checks
+N = 1000; % 1000 is recomended but number of bootstraps to run to determine confidence intervals, can lower to 50 for fast checks
 
 pDevBool = 'yes'; %optional, have as an extant varialbe to run goodness of fit simulations
+
+PF = @PAL_Weibull;
 
 %Get StimLevels (coherence leves)
 StimLevels = round(data(:,4)*100); %making into intergers and rounding
@@ -83,10 +85,28 @@ for i=1:length(StimLevels)
 end
 
 %% Perfom fits
- [Threshold75, Threshold82, paramsValues, ProportionCorrectObserved,deltaCoherence, Dev, pDev, ci_thr, ci_data, boot_data, t_boot, sl_boot] =  PsychCurve_unsided_dots(StimLevels, NumPos, OutOfNum, animalId,N,pDevBool)
+ [ Threshold75, Threshold82 ,paramsValues, ProportionCorrectObserved,deltaCoherence, Dev, pDev, ci_thr, ci_s, ci_data, data_boot, t_boot, sl_boot] =  PsychCurve_unsided_dots(StimLevels, NumPos, OutOfNum, animalId,N,pDevBool);
 
  
-
+%%
+ProportionCorrectObserved=NumPos./OutOfNum; 
+StimLevelsFineGrain=(min(StimLevels):max(StimLevels)/1000:max(StimLevels));
+ProportionCorrectModel = PF(paramsValues,StimLevelsFineGrain);
+ 
+figure('name','Maximum Likelihood Psychometric Function Fitting');
+plot(StimLevels,ProportionCorrectObserved,'k.','markersize',40);
+set(gca, 'fontsize',16);
+set(gca, 'Xtick',StimLevels);
+axis([min(StimLevels) max(StimLevels) 0 1]);
+hold on;
+plot(StimLevelsFineGrain,ProportionCorrectModel,'g-','linewidth',4);
+hold on; plot(StimLevels,.5*(ones(size(StimLevels))), 'r--')
+errorbar(StimLevels, ProportionCorrectObserved, ((ci_data(2,:)) - (ci_data(1,:))), ((ci_data(3, :)) - (ci_data(2,:))))
+xlabel('coherence level');
+ylabel('proportion correct');
+set(gca, 'fontsize',11);
+title(animalId)
+%ci_data is the 95% confidence intervals
  %% Save data
 %
 sessionResults.files = fnames;
@@ -101,9 +121,16 @@ sessionResults.eyeVisual = eyeVisual;
 sessionResults.dotSpeed = dotSpeed;
 sessionResults.numTrials = trialcount;
 sessionResults.numSessions = numSessions;
+sessionResults.PorCorrect = ProportionCorrectObserved;
+sessionResults.ci_thr = ci_thr;
+sessionResults.ci_s = ci_s;
+sessionResults.ci_data = ci_data;
+sessionResults.thr_boot = t_boot;
+sessionResults.slope_boot = sl_boot;
+sessionResults.paramsValues = paramsValues;
 
 
-cd 'Z:\Ferret Behavior\RDK\Amblyopia\stairs dominant\72_d_s'
+cd 'Z:\Ferret Behavior\RDK\Amblyopia\'
 save(animalId, 'sessionResults');
 
 

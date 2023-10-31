@@ -1,5 +1,5 @@
 
-function [Threshold75,Threshold82 ,paramsValues, ProportionCorrectObserved,deltaCoherence, Dev, pDev, ci_thr, ci_s, ci_data, data_boot, t_boot, sl_boot] =  PsychCurve_unsided_dots(StimLevels, NumPos, OutOfNum,animalId,N,pDevBool)
+function [ Threshold75, Threshold82 ,paramsValues, ProportionCorrectObserved,deltaCoherence, Dev, pDev, ci_thr, ci_s, ci_data, data_boot, t_boot, sl_boot] =  PsychCurve_unsided_dots(StimLevels, NumPos, OutOfNum,animalId,N,pDevBool)
 %%%%% PALAMEDES FUNCTIONS FOR %CORRECT/UNSIDED ANALYSIS%%%%%%%%
 
 %Required inputs: 
@@ -125,7 +125,7 @@ deltaCoherence = sixtyseven - middlepoint;
 %
 if exist('pDevBool','var') & pDevBool
 %Number of simulations to perform to determine Goodness-of-Fit
-B=1000;
+B=100;
 % 
 disp('Determining Goodness-of-fit.....');
 %Output: 
@@ -156,18 +156,18 @@ ProportionCorrectObserved=NumPos./OutOfNum;
 StimLevelsFineGrain=(min(StimLevels):max(StimLevels)/1000:max(StimLevels));
 ProportionCorrectModel = PF(paramsValues,StimLevelsFineGrain);
  
-figure('name','Maximum Likelihood Psychometric Function Fitting');
-plot(StimLevels,ProportionCorrectObserved,'k.','markersize',40);
-set(gca, 'fontsize',16);
-set(gca, 'Xtick',StimLevels);
-axis([min(StimLevels) max(StimLevels) 0 1]);
-hold on;
-plot(StimLevelsFineGrain,ProportionCorrectModel,'g-','linewidth',4);
-hold on; plot(StimLevels,.5*(ones(size(StimLevels))), 'r--')
-xlabel('coherence level');
-ylabel('proportion correct');
-set(gca, 'fontsize',11);
-% TO DO list add error bars that are the confidence intervals contained in
-% boot_data
-title(animalId)
+% figure('name','Maximum Likelihood Psychometric Function Fitting');
+% plot(StimLevels,ProportionCorrectObserved,'k.','markersize',40);
+% set(gca, 'fontsize',16);
+% set(gca, 'Xtick',StimLevels);
+% axis([min(StimLevels) max(StimLevels) 0 1]);
+% hold on;
+% plot(StimLevelsFineGrain,ProportionCorrectModel,'g-','linewidth',4);
+% hold on; plot(StimLevels,.5*(ones(size(StimLevels))), 'r--')
+% xlabel('coherence level');
+% ylabel('proportion correct');
+% set(gca, 'fontsize',11);
+% % TO DO list add error bars that are the confidence intervals contained in
+% % boot_data
+% title(animalId)
 
